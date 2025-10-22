@@ -14,9 +14,14 @@ function conexionBD_Localhost($bd){
 	$user = 'alumnos_user';
 	$pass = 'eOrXm9DVTwpzWxpvLI1P9bj6tyRFpRCp';
 	$bd = $bd;
-	$connec = pg_connect("host=$server dbname=$bd user=$user password=$pass") or die ("Error de conexion servidor ".$server);
+	
+	$connec = @pg_connect("host=$server dbname=$bd user=$user password=$pass");
+	
+    if (!$connec) {
+        return false; 
+    }
+    
 	return $connec;    
 }
 
-?>
 
