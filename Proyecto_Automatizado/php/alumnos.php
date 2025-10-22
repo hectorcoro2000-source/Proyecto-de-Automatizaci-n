@@ -1,7 +1,7 @@
 <?php
 // Incluye el archivo que contiene la función de conexión a la BD
 require_once 'conexion.php'; 
-const DB_NAME = "postgres"; 
+const DB_NAME = "alumnos_db_ufnj"; 
 
 // ==========================================================
 // 1. MANEJO DE PETICIONES POST DESDE JAVASCRIPT
@@ -172,4 +172,5 @@ function cambiarContrasena($correo, $contrasena_actual, $contrasena_nueva, $conn
     }
     
     return $response;
+
 }
