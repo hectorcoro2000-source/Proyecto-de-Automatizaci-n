@@ -7,28 +7,40 @@ const DB_NAME = "alumnos_db_ufnj";
 // 1. MANEJO DE PETICIONES POST DESDE JAVASCRIPT
 // ==========================================================
 
+require_once 'conexion.php'; 
+const DB_NAME = "alumnos_db_ufnj"; 
+
+// ==========================================================
+// 1. MANEJO DE PETICIONES POST DESDE JAVASCRIPT
+// ==========================================================
+
+require_once 'conexion.php'; 
+const DB_NAME = "alumnos_db_ufnj"; 
+
+// ==========================================================
+// 1. MANEJO DE PETICIONES POST DESDE JAVASCRIPT (SIMPLIFICADO)
+// ==========================================================
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     
     $response = ['success' => false, 'message' => 'Acción no reconocida.'];
     
-    // Captura los parámetros generales (usados en login/register)
+    // Captura de parámetros
     $correo = filter_input(INPUT_POST, 'correo', FILTER_SANITIZE_EMAIL);
     $contrasena = $_POST['contrasena'] ?? ''; 
-    
-    // Captura los parámetros de la acción 'change_password' (NUEVOS)
     $contrasena_actual = $_POST['contrasena_actual'] ?? '';
     $contrasena_nueva = $_POST['contrasena_nueva'] ?? '';
 
-    // 🎯 Solución al JSON: Capturamos la salida del buffer si el die() en conexion.php se ejecuta
-    ob_start(); 
+    // Llama a la conexión de forma limpia
     $conn = conexionBD_Localhost(DB_NAME); 
-    $connection_error = ob_get_clean();
 
-    if ($connection_error) {
-        // La conexión falló, devolvemos un JSON de error controlado.
-        $response['message'] = "❌ Fallo de conexión al servidor de base de datos. [Detalle: " . trim($connection_error) . "]";
+    if (!$conn) {
+        // La conexión falló, devolvemos un JSON de error de conexión limpio.
+        $response['message'] = "❌ Fallo de conexión al servidor de base de datos. Verifique credenciales.";
         
     } else {
+        // La conexión fue exitosa, procedemos con el switch
+
         switch ($_POST['action']) {
             case 'login':
                 if (empty($correo) || empty($contrasena)) {
@@ -46,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 }
                 break;
                 
-            case 'change_password': // ¡CASO RESTAURADO!
+            case 'change_password': 
                 if (empty($correo) || empty($contrasena_actual) || empty($contrasena_nueva)) {
                     $response['message'] = "⚠️ Todos los campos son obligatorios para cambiar la contraseña.";
                 } else {
@@ -55,12 +67,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 break;
 
             default:
-                // Solo se ejecuta si la acción del JS está mal escrita
                 $response['message'] = "Acción no válida."; 
                 break;
         }
         
-        pg_close($conn);
+        pg_close($conn); // Cerrar la conexión aquí
     }
 
     header('Content-Type: application/json');
@@ -174,3 +185,4 @@ function cambiarContrasena($correo, $contrasena_actual, $contrasena_nueva, $conn
     return $response;
 
 }
+
